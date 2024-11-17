@@ -13,7 +13,7 @@ The 2D cutting tool supports cutting 2D materials, mainly rectangles, into small
 ### Requirements
 - Python 3.8 or higher.
 - Dependencies: `numpy`, `matplotlib`, `flask`
-- Operating system: Windows, Linux, macOS.
+- Operating system: Windows.
 
 ### Setting Up
 
