@@ -25,10 +25,10 @@ The 2D cutting tool supports cutting 2D materials, mainly rectangles, into small
    ```bash
    pip install -r requirements.txt
 
-4. Run the tool:
+3. Run the tool:
    ```bash
-  python route.py
+   python route.py
 
-5. Open http://localhost:5000 to use tool.
+4. Open http://localhost:5000 to use tool.
 ![image](https://github.com/user-attachments/assets/f3467120-32aa-4077-aa13-4c7719406832)
 
