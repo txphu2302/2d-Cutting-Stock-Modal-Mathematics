@@ -25,4 +25,6 @@ The 2D cutting tool supports cutting 2D materials, mainly rectangles, into small
    pip install -r requirements.txt
 
 3. Run the tool:
-  python route.py
+  python route.py (this will render to http://localhost:5000)
+![image](https://github.com/user-attachments/assets/f3467120-32aa-4077-aa13-4c7719406832)
+
