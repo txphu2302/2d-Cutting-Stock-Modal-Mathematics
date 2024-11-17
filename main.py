@@ -2,6 +2,19 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 def stock_cutter(child_rects, parent_rect):
+    """
+    2D cutting stock problem solver with demand support (heuristic method).
+    The algorithm now prioritizes filling the parent rectangle as much as possible
+    before moving on to the next parent rectangle.
+
+    Parameters:
+        child_rects: List of [width, height, demand] for child rectangles.
+        parent_rect: [width, height] of the parent rectangle.
+
+    Returns:
+        List of placements for child rectangles [[x1, y1, x2, y2], ...] and their sizes.
+        The number of parent rectangles used.
+    """
     # Expanded rectangles based on demand
     expanded_rects = []
     for rect in child_rects:
