@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file
 import matplotlib.pyplot as plt
 from main import stock_cutter, draw_multiple_parent_rects
 import io
@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return send_file('index.html')
 
 @app.route('/cut-stock', methods=['POST'])
 def cut_stock():
