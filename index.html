@@ -39,21 +39,28 @@
     <p class="text-center text-muted">Optimize the cutting of stock materials into specified sizes</p>
 
     <!-- Parent Rectangle Input as Table -->
-    <h4>Large stock:</h4>
+    <!-- Parent Rectangles Table -->
+    <h4>Available stock sizes:</h4>
     <table class="table table-bordered text-center">
         <thead class="table-light">
             <tr>
                 <th>Width</th>
                 <th>Height</th>
+                <th>Quantity</th>
+                <th>Action</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="parentTableBody">
             <tr>
-                <td><input type="number" id="parentWidth" class="form-control" placeholder="Width"></td>
-                <td><input type="number" id="parentHeight" class="form-control" placeholder="Height"></td>
+                <td><input type="number" class="form-control" placeholder="Width"></td>
+                <td><input type="number" class="form-control" placeholder="Height"></td>
+                <td><input type="number" class="form-control" placeholder="Quantity"></td>
+                <td><button type="button" class="btn btn-danger btn-sm remove-parent-row">Remove</button></td>
             </tr>
         </tbody>
     </table>
+    <button type="button" class="btn btn-success" id="addParentRow">Add Stock Size</button>
+
 
     <!-- Child Rectangles Table -->
     <h4>Demand for products:</h4>
@@ -98,6 +105,23 @@
 
 <script>
     $(document).ready(function() {
+        // Add a new row to the parent rectangles table
+        $("#addParentRow").click(function() {
+            const newRow = 
+                `<tr>
+                    <td><input type="number" class="form-control" placeholder="Width"></td>
+                    <td><input type="number" class="form-control" placeholder="Height"></td>
+                    <td><input type="number" class="form-control" placeholder="Quantity"></td>
+                    <td><button type="button" class="btn btn-danger btn-sm remove-parent-row">Remove</button></td>
+                </tr>`;
+            $("#parentTableBody").append(newRow);
+        });
+
+        // Remove a row from the parent table
+        $(document).on("click", ".remove-parent-row", function() {
+            $(this).closest("tr").remove();
+        });
+
         // Add a new row to the child rectangles table
         $("#addRow").click(function() {
             const newRow = `
@@ -119,17 +143,22 @@
         // Submit the form and send data to the backend
         $("#submitForm").click(function () {
             // Lấy giá trị từ bảng Parent Rectangle
-            const parentWidth = parseInt($("#parentWidth").val());
-            const parentHeight = parseInt($("#parentHeight").val());
+            // Get parent rectangles from the table
+            const stocks = [];
+            $("#parentTableBody tr").each(function () {
+                const width = parseInt($(this).find("td:eq(0) input").val());
+                const height = parseInt($(this).find("td:eq(1) input").val());
+                const quantity = parseInt($(this).find("td:eq(2) input").val());
+                if (width && height && quantity) {
+                    stocks.push([width, height, quantity]);
+                }
+            });
 
-            // Kiểm tra giá trị hợp lệ
-            if (!parentWidth || !parentHeight || parentWidth <= 0 || parentHeight <= 0) {
-                alert("Please enter valid dimensions for the Parent Rectangle.");
+            if (stocks.length === 0) {
+                alert("Please fill in the stock sizes table.");
                 return;
             }
 
-            // Chuyển đổi Parent Rectangle thành mảng
-            const stock = [parentWidth, parentHeight];
 
             const demand = [];
             $("#childTableBody tr").each(function () {
@@ -151,27 +180,22 @@
                 url: "/cut-stock",
                 type: "POST",
                 contentType: "application/json",
-                data: JSON.stringify({ stock: stock, demand: demand }),
+                data: JSON.stringify({ stocks: stocks, demand: demand }),
                 success: function(response) {
                     const result = response;
 
-                    // Display placements and parent count
-                    let resultHtml = `
-                        <p><strong>Parent Count:</strong> ${result.parent_count}</p>
-                        <h4>Placements:</h4>
-                        <ul class="list-group">
-                    `;
-                    for (let i = 0; i < result.placements.length; i++) {
-                        resultHtml += `
-                            <li class="list-group-item">
-                                <strong>Rectangle ${result.sizes[i][0]}x${result.sizes[i][1]}</strong> 
-                                placed at (${result.placements[i][0]}, ${result.placements[i][1]})
-                            </li>
-                        `;
+                    // Display placements and parent information
+                    let resultHtml = `<p><strong>Total Parent Rectangles Used:</strong> ${result.expanded_parents.length}</p>`;
+                    for (let i = 0; i < result.expanded_parents.length; i++) {
+                        resultHtml += `<h5>Parent Rectangle ${i + 1} (${result.expanded_parents[i][0]}x${result.expanded_parents[i][1]}):</h5>`;
+                        resultHtml += `<ul class="list-group">`;
+                        for (let j = 0; j < result.placements.length; j++) {
+                            if (result.placement_parents[j] === i) {
+                                resultHtml += `<li class="list-group-item">Rectangle ${result.sizes[j][0]}x${result.sizes[j][1]} placed at (${result.placements[j][0]}, ${result.placements[j][1]})</li>`;
+                            }
+                        }
+                        resultHtml += `</ul>`;
                     }
-                    resultHtml += "</ul>";
-                    $("#result-content").html(resultHtml);
-
                     // Set the image for display
                     $("#result-image").attr("src", "data:image/png;base64," + result.image);
 

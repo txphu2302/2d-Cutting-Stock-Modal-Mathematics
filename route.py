@@ -16,17 +16,18 @@ def cut_stock():
     # Get data from the client
     data = request.get_json()
     demand = data['demand']
-    stock = data['stock']
+    stocks = data['stocks']
 
     # Convert data to the format stock_cutter needs
     child_rects = [[int(w), int(h), int(q)] for w, h, q in demand]
-    parent_rect = [int(stock[0]), int(stock[1])]
+    parent_rects = [[int(w), int(h), int(q)] for w, h, q in stocks]
 
     # Perform the stock cutting algorithm
-    placements, sizes, parent_count, used_spaces_per_parent = stock_cutter(child_rects, parent_rect)
+    placements, sizes, placement_parents, expanded_parents, used_spaces_per_parent = stock_cutter(child_rects, parent_rects)
+
 
     # Generate a visualization
-    fig = draw_multiple_parent_rects(placements, sizes, parent_rect, parent_count, used_spaces_per_parent)
+    fig = draw_multiple_parent_rects(placements, sizes, expanded_parents, placement_parents, used_spaces_per_parent)
     buf = io.BytesIO()
     fig.savefig(buf, format='png')
     buf.seek(0)
@@ -48,12 +49,14 @@ def cut_stock():
 
     # Return results and image
     result = {
-        'placements': placements,
-        'sizes': sizes,
-        'parent_count': parent_count,
-        'image': image_base64,
-        'image_url': f"/{image_path}"
-    }
+    'placements': placements,
+    'sizes': sizes,
+    'placement_parents': placement_parents,
+    'expanded_parents': expanded_parents,
+    'image': image_base64,
+    'image_url': f"/{image_path}"
+}
+
     return jsonify(result)
 
 
