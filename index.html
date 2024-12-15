@@ -91,7 +91,6 @@
 </div>
     
 
-
 <!-- Bootstrap JS and jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -118,17 +117,17 @@
 
         // Submit the form and send data to the backend
         $("#submitForm").click(function () {
-            // Lấy giá trị từ bảng Parent Rectangle
+            // Get values from Parent Rectangle table
             const parentWidth = parseInt($("#parentWidth").val());
             const parentHeight = parseInt($("#parentHeight").val());
 
-            // Kiểm tra giá trị hợp lệ
+            // Validate values
             if (!parentWidth || !parentHeight || parentWidth <= 0 || parentHeight <= 0) {
                 alert("Please enter valid dimensions for the Parent Rectangle.");
                 return;
             }
 
-            // Chuyển đổi Parent Rectangle thành mảng
+            // Convert Parent Rectangle to array
             const stock = [parentWidth, parentHeight];
 
             const demand = [];
@@ -146,7 +145,7 @@
                 return;
             }
 
-            // Gửi yêu cầu AJAX đến backend
+            // Send AJAX request to backend
             $.ajax({
                 url: "/cut-stock",
                 type: "POST",
@@ -155,21 +154,12 @@
                 success: function(response) {
                     const result = response;
 
-                    // Display placements and parent count
+                    // Display results
                     let resultHtml = `
                         <p><strong>Parent Count:</strong> ${result.parent_count}</p>
-                        <h4>Placements:</h4>
-                        <ul class="list-group">
+                        <p><strong>Filled Ratio:</strong> ${(result.filled_ratio * 100).toFixed(2)}%</p>
+                        <p><strong>Trim Loss:</strong> ${(result.trim_loss * 100).toFixed(2)}%</p>
                     `;
-                    for (let i = 0; i < result.placements.length; i++) {
-                        resultHtml += `
-                            <li class="list-group-item">
-                                <strong>Rectangle ${result.sizes[i][0]}x${result.sizes[i][1]}</strong> 
-                                placed at (${result.placements[i][0]}, ${result.placements[i][1]})
-                            </li>
-                        `;
-                    }
-                    resultHtml += "</ul>";
                     $("#result-content").html(resultHtml);
 
                     // Set the image for display

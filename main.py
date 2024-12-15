@@ -14,6 +14,7 @@ def stock_cutter(child_rects, parent_rect):
     Returns:
         List of placements for child rectangles [[x1, y1, x2, y2], ...] and their sizes.
         The number of parent rectangles used.
+        The filled ratio and trim loss.
     """
     # Expanded rectangles based on demand
     expanded_rects = []
@@ -26,14 +27,6 @@ def stock_cutter(child_rects, parent_rect):
 
     # List to store used spaces for each parent rectangle
     used_spaces_per_parent = [[]]
-
-    # Store demand for each child (rectangles with their demand still pending)
-    remaining_demand = {}
-    for rect in child_rects:
-        width, height, demand = rect
-        remaining_demand[tuple([width, height])] = demand
-        if width != height:  # Add rotated version as well
-            remaining_demand[tuple([height, width])] = remaining_demand.get(tuple([height, width]), 0) + demand
 
     # Try to fit as many rectangles as possible in the parent
     placements = []
@@ -56,14 +49,6 @@ def stock_cutter(child_rects, parent_rect):
                             sizes.append([width, height])
                             used_spaces_per_parent[parent].append([x, y, x + width, y + height])  # Mark space as used
                             placed = True
-                            if (width, height) in remaining_demand:
-                                remaining_demand[(width, height)] -= 1
-                                if remaining_demand[(width, height)] == 0:
-                                    del remaining_demand[(width, height)]
-                            elif (height, width) in remaining_demand:
-                                remaining_demand[(height, width)] -= 1
-                                if remaining_demand[(height, width)] == 0:
-                                    del remaining_demand[(height, width)]
                             break
                     if placed:
                         break
@@ -86,21 +71,24 @@ def stock_cutter(child_rects, parent_rect):
                             sizes.append([width, height])
                             used_spaces_per_parent[-1].append([x, y, x + width, y + height])  # Mark space as used
                             placed = True
-                            if (width, height) in remaining_demand:
-                                remaining_demand[(width, height)] -= 1
-                                if remaining_demand[(width, height)] == 0:
-                                    del remaining_demand[(width, height)]
-                            elif (height, width) in remaining_demand:
-                                remaining_demand[(height, width)] -= 1
-                                if remaining_demand[(height, width)] == 0:
-                                    del remaining_demand[(height, width)]
                             break
                     if placed:
                         break
                 if placed:
                     break
 
-    return placements, sizes, parent_count, used_spaces_per_parent
+    # Calculate total area of child rectangles placed
+    total_child_area = sum(w * h for w, h in sizes)
+
+    # Calculate parent rectangle area
+    parent_area = parent_rect[0] * parent_rect[1]
+
+    # Calculate filled ratio and trim loss
+    filled_ratio = total_child_area / (parent_count * parent_area)
+    trim_loss = ((parent_count * parent_area) - total_child_area) / total_child_area
+
+    return placements, sizes, parent_count, used_spaces_per_parent, filled_ratio, trim_loss
+
 
 def draw_multiple_parent_rects(placements, sizes, parent_rect, parent_count, used_spaces_per_parent):
     """
