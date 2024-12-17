@@ -32,7 +32,7 @@ The 2D cutting tool supports cutting 2D materials, mainly rectangles, into small
 4. Open http://localhost:5000 to use tool.
 ![image](https://github.com/user-attachments/assets/f3467120-32aa-4077-aa13-4c7719406832)
 
-### Demo
+## Demo
 
 - Large sheet size: 100 cm x 50 cm
 - Piece A: 20 cm x 10 cm (Quantity = 10)
@@ -42,7 +42,7 @@ The 2D cutting tool supports cutting 2D materials, mainly rectangles, into small
 
 ![image](https://github.com/user-attachments/assets/d12da677-1f4f-4758-b6f8-d9226cd64275)
 
-### Result
+## Result
 
 ![image](https://github.com/user-attachments/assets/68239f25-40b7-4fde-95a2-48c5b5a630d3)
 
